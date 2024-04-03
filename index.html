@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+	<title>Network Data Calculator</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+	<div class="container">
+		<h1>Network Data Calculator</h1>
+		<div class="form-group">
+			<div class="form-row">
+				<div class="form-col col-exit"></div>
+				
+				<div class="form-col col-isp">
+					<label>Provider</label>
+				</div>
+				<div class="form-col col-data">
+					<label>Priority</label>
+				</div>
+				<div class="form-col col-data">
+					<label>De-prioritized</label>
+				</div>
+				<div class="form-col col-total">
+					<label>Monthly Usage</label>
+				</div>
+			</div>
+
+			<div class="form-row">
+				<div class="form-col col-exit"><button onClick="removeRow('${i}')">X</button></div>
+				
+				<div class="form-col col-isp">
+					<input type="text" id="isp" name="isp" placeholder="ISP" class="input-large">
+				</div>
+				<div class="form-col col-data">
+					<input type="number" id="priority_mbps" name="nonpriority_mbps" min="0" step=".01" placeholder="Mbps" >
+					<input type="number" id="priority_mb_cap" name="priority_mb_cap" min="0" step=".01" placeholder="Mb cap">
+				</div>
+				<div class="form-col col-data">
+					<input type="number" id="nonpriority_mbps" name="nonpriority_mbps" min="0" step=".01" placeholder="Mbps">
+					<input type="number" id="nonpriority_mb_cap" name="nonpriority_mb_cap" min="0" step=".01" placeholder="Mb cap">
+				</div>
+				<div class="form-col col-total">
+					<input type="number" id="total_data" name="total_data" min="0" step=".01" placeholder="MBs used">
+				</div>
+			</div>
+			<button onClick="addRow()">Add Row</button>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		const storedData = JSON.parse(localStorage.getItem('data')) ?? [];
+
+		const data = [
+			{
+				isp: null,
+				priority_mbps: null,
+				priority_mb_cap: null,
+				nonpriority_mbps: null,
+				nonpriority_mb_cap: null,
+				total_data: null
+			},
+			...storedData
+		];
+
+		// Initialize the form fields
+		function init() {
+
+			// Load data into each field
+			document.getElementById("isp").value = data[0].isp;
+			document.getElementById("priority_mbps").value = data[0].priority_mbps;
+			document.getElementById("priority_mb_cap").value = data[0].priority_mb_cap;
+			document.getElementById("nonpriority_mbps").value = data[0].nonpriority_mbps;
+			document.getElementById("nonpriority_mb_cap").value = data[0].nonpriority_mb_cap;
+			document.getElementById("total_data").value = data[0].total_data;
+		}
+		init();
+	</script>
+
+</body>
+</html>

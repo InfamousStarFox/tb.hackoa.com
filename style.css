@@ -1,0 +1,103 @@
+body {
+    font-family: sans-serif;
+    background-color: #f3f6fa;
+}
+h1 {
+    border-top: 5px solid black;
+    border-bottom: 5px solid black;
+    padding: 5px;
+}
+h1,h2,h3,h4 {
+    text-align: center;
+}
+
+.container {
+    max-width: 750px;
+    margin: 0px auto;
+    background-color: white;
+    padding: 10px 40px 30px 40px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+    border: 1px solid rgba(0, 0, 0, .125);
+}
+
+@media (max-width: 750px) {
+    body {
+        margin: 0px;
+    }
+    .container {
+        padding: 5px 15px 15px 15px;
+    }
+}
+
+.form-group {
+    margin-bottom: 1rem;
+    margin: 0px auto;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-items: center;
+    justify-content: center;
+}
+
+.form-col {
+    margin: 5px;
+    flex: 1;
+}
+
+label {
+    display: inline-block;
+    margin-bottom: .5rem;
+}
+
+input {
+    padding: .375rem .75rem;
+    width: calc(100% - 24px);
+    max-width: 100%;
+}
+
+.col-exit {
+    min-width: 30px;
+    max-width: 30px;
+}
+
+.col-exit button {
+    width: 30px;
+    height: 30px;
+}
+
+.col-isp {
+    min-width: 70px;
+}
+
+@media (max-width: 525px) {
+    .col-isp {
+        display: none;
+    }
+}
+
+.col-data {
+    min-width: 100px;
+    max-width: 100px;
+}
+
+.col-total {
+    min-width: 100px;
+    max-width: 125px;
+}
+
+
+input, button {
+    color: #495057;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    display: block;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 5px;
+    width: 100%;
+    margin: 5px;
+}
