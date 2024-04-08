@@ -13,8 +13,7 @@
 		<h1>Network Data Calculator</h1>
 		<div class="form-group">
 			<div class="form-row">
-				<div class="form-col col-exit"></div>
-				
+				<div class="form-col col-remove"></div>
 				<div class="form-col col-isp">
 					<label>Provider</label>
 				</div>
@@ -28,57 +27,113 @@
 					<label>Monthly Usage</label>
 				</div>
 			</div>
-
-			<div class="form-row">
-				<div class="form-col col-exit"><button onClick="removeRow('${i}')">X</button></div>
-				
-				<div class="form-col col-isp">
-					<input type="text" id="isp" name="isp" placeholder="ISP" class="input-large">
-				</div>
-				<div class="form-col col-data">
-					<input type="number" id="priority_mbps" name="nonpriority_mbps" min="0" step=".01" placeholder="Mbps" >
-					<input type="number" id="priority_mb_cap" name="priority_mb_cap" min="0" step=".01" placeholder="Mb cap">
-				</div>
-				<div class="form-col col-data">
-					<input type="number" id="nonpriority_mbps" name="nonpriority_mbps" min="0" step=".01" placeholder="Mbps">
-					<input type="number" id="nonpriority_mb_cap" name="nonpriority_mb_cap" min="0" step=".01" placeholder="Mb cap">
-				</div>
-				<div class="form-col col-total">
-					<input type="number" id="total_data" name="total_data" min="0" step=".01" placeholder="MBs used">
-				</div>
-			</div>
-			<button onClick="addRow()">Add Row</button>
 		</div>
+		<div id="table-rows" class="form-group"></div>
+		<button onClick="addRow()">Add Row</button>
 	</div>
 
 	<script type="text/javascript">
 		const storedData = JSON.parse(localStorage.getItem('data')) ?? [];
+		const tableRows = document.getElementById("table-rows");
 
-		const data = [
-			{
-				isp: null,
-				priority_mbps: null,
-				priority_mb_cap: null,
-				nonpriority_mbps: null,
-				nonpriority_mb_cap: null,
-				total_data: null
-			},
-			...storedData
-		];
+		const emptyRow = () => ({
+			isp: '',
+			priority_mbps: '',
+			priority_mb_cap: '',
+			nonpriority_mbps: '',
+			nonpriority_mb_cap: '',
+			total_data: ''
+		});
 
-		// Initialize the form fields
-		function init() {
+		const data = storedData.length
+			? storedData
+			: [emptyRow()];
 
-			// Load data into each field
-			document.getElementById("isp").value = data[0].isp;
-			document.getElementById("priority_mbps").value = data[0].priority_mbps;
-			document.getElementById("priority_mb_cap").value = data[0].priority_mb_cap;
-			document.getElementById("nonpriority_mbps").value = data[0].nonpriority_mbps;
-			document.getElementById("nonpriority_mb_cap").value = data[0].nonpriority_mb_cap;
-			document.getElementById("total_data").value = data[0].total_data;
+		function addRow(index) {
+			const i = index ?? tableRows.childElementCount;
+
+			if (i >= data.length) {
+				console.log(true);
+				data[i] = emptyRow();
+			}
+
+			const newRow = document.createElement("div");
+			newRow.className = "form-row";
+			newRow.id = `row_${i}`;
+			newRow.innerHTML = `
+					<div class="form-col col-remove"><button onClick="removeRow('${i}')">X</button></div>
+					<div class="form-col col-isp">
+						<input type="text" id="isp_${i}" value="${data[i].isp}" placeholder="ISP" class="input-large">
+					</div>
+					<div class="form-col col-data">
+						<input type="number" id="priority_mbps_${i}" value="${data[i].priority_mbps}" min="0" step=".01" placeholder="Mbps" >
+						<input type="number" id="priority_mb_cap_${i}" value="${data[i].priority_mb_cap}" min="0" step=".01" placeholder="Mb cap">
+					</div>
+					<div class="form-col col-data">
+						<input type="number" id="nonpriority_mbps_${i}" value="${data[i].nonpriority_mbps}" min="0" step=".01" placeholder="Mbps">
+						<input type="number" id="nonpriority_mb_cap_${i}" value="${data[i].nonpriority_mb_cap}" min="0" step=".01" placeholder="Mb cap">
+					</div>
+					<div class="form-col col-total">
+						<input type="text" id="total_data_${i}" value="${data[i].total_data}" disabled placeholder="MBs used">
+					</div>
+				`;
+			tableRows.appendChild(newRow);
+
+			newRow.addEventListener("keyup", () => {
+				data[i].isp = document.getElementById(`isp_${i}`).value;
+				data[i].priority_mbps = document.getElementById(`priority_mbps_${i}`).value;
+				data[i].priority_mb_cap = document.getElementById(`priority_mb_cap_${i}`).value;
+				data[i].nonpriority_mbps = document.getElementById(`nonpriority_mbps_${i}`).value;
+				data[i].nonpriority_mb_cap = document.getElementById(`nonpriority_mb_cap_${i}`).value;
+				calculate(i);
+				localStorage.setItem('data', JSON.stringify(data));
+			});
+
 		}
-		init();
+
+		function removeRow(i) {
+			document.getElementById(`row_${i}`).remove();
+			console.log(data.splice(i, 1));
+			localStorage.setItem('data', JSON.stringify(data));
+		}
+
+		function calculate(i) {
+			const seconds_per_month = 2592000;
+			const row = data[i];
+			const p_cap = row.priority_mb_cap ?? 0;
+			const p_mbps = row.priority_mbps ?? 0;
+			const p_time_to_reach_cap = Math.min((p_cap ? p_cap / p_mbps : seconds_per_month), seconds_per_month);
+
+			const time_remaining = p_mbps ? (seconds_per_month - p_time_to_reach_cap) : seconds_per_month;
+
+			const np_cap = row.nonpriority_mb_cap ?? 0;
+			const np_mbps = row.nonpriority_mbps ?? 0;
+			const np_time_to_reach_cap = Math.min((np_cap ? np_cap / np_mbps : seconds_per_month), time_remaining);
+			const total_mb = (p_mbps * p_time_to_reach_cap) + (np_mbps * np_time_to_reach_cap);
+
+			let total = (total_mb / 8);
+			const endings = ['MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+			let index = 0;
+			while (total > 1000) {
+				if (index === endings.length - 1) {
+					break;
+				}
+				total = total / 1024;
+				index++;
+			}
+			ending = endings[index];
+
+			const value = `${parseFloat(total).toFixed(2)} ${ending}`;
+			data[i].total_data = value;
+			document.getElementById(`total_data_${i}`).value = value;
+		}
+
+		data.forEach((_, index) => {
+			addRow(index);
+		});
+
 	</script>
 
 </body>
+
 </html>

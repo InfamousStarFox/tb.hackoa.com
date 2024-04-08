@@ -36,7 +36,7 @@ h1,h2,h3,h4 {
 
 .form-row {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-items: center;
     justify-content: center;
 }
@@ -57,12 +57,12 @@ input {
     max-width: 100%;
 }
 
-.col-exit {
+.col-remove {
     min-width: 30px;
     max-width: 30px;
 }
 
-.col-exit button {
+.col-remove button {
     width: 30px;
     height: 30px;
 }
@@ -99,5 +99,4 @@ input, button {
 button {
     padding: 5px;
     width: 100%;
-    margin: 5px;
 }
